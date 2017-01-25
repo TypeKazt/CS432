@@ -1,6 +1,6 @@
 LDLIBS = -lglut -lGLEW -lGL -lGLU
 
-FNAME = test_main 
+FNAME = Sample01_2DGraphcis
 
 CXXINCS = -I../../include
 
@@ -12,12 +12,18 @@ TARGETS = $(basename $(EXAMPLELIST))
 DEPS = $(TARGETS:=.o)
 
 all: $(FNAME:=.o) $(TARGETS)
-	g++ $(DEPS) $(LDLIBS) -o $(FNAME) 
+	g++  $(DEPS) $(LDLIBS) -o $(FNAME)
 
-
-$(TARGETS): $(INIT_SHADER_OBJ)
-	g++ -c $@.cpp -o $@.o -ggdb
+$(FNAME:=.o): $(FNAME:=.cpp)
+	g++ -c $(FNAME:=.cpp) -o $(FNAME:=.o) -O2 $(CXXINCS)
 	
+$(TARGETS): $(INIT_SHADER_OBJ)
+	g++ -c $@.cpp -o $@.o -O2 $(CXXINCS)
+	
+	
+$(INIT_SHADER_OBJ): $(INIT_SHADER)
+	g++ -c -Wall $(INIT_SHADER) -o $(INIT_SHADER_OBJ) -O2 $(CXXINCS)
+
 clean:
 	rm *.o
 	
