@@ -1,6 +1,6 @@
 LDLIBS = -lglut -lGLEW -lGL -lGLU
 
-FNAME = test_main 
+FNAME = main
 
 CXXINCS = -I../../include
 
