@@ -1,11 +1,11 @@
 LDLIBS = -lglut -lGLEW -lGL -lGLU
 
-FNAME = Sample03_Lighting
+FNAME = Sample02_3DGraphcis
 
 CXXINCS = -I../../include
 
-INIT_SHADER = InitShader.cpp
-INIT_SHADER_OBJ = InitShader.o
+INIT_SHADER = ./InitShader.cpp
+INIT_SHADER_OBJ = ./InitShader.o
 
 EXAMPLELIST = $(wildcard *.cpp)
 TARGETS = $(basename $(EXAMPLELIST))

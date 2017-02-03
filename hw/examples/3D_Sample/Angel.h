@@ -39,6 +39,7 @@
 #include <GL/glew.h>
 #  include <GL/freeglut.h>
 #  include <GL/freeglut_ext.h>
+# include <stdio.h>
 
 
 #endif  // __APPLE__
