@@ -1,7 +1,7 @@
 #include "Shape.h"
 Shape::Shape(int n) {
 	this->n = n;
-	this->vertexLocations = new vec3[n];
+	this->vertexLocations = new vec4[n];
 	draw_mode = GL_TRIANGLES;
 }
 
@@ -18,13 +18,13 @@ void Shape::build(){
 		//move the data onto the buffer
 		glBindVertexArray(VAO);
 		glBindBuffer( GL_ARRAY_BUFFER, VBO);
-		glBufferData( GL_ARRAY_BUFFER, n*sizeof(*vertexLocations),NULL, GL_STATIC_DRAW );
-		glBufferSubData(GL_ARRAY_BUFFER,0,n*sizeof(*vertexLocations),vertexLocations);
+		glBufferData( GL_ARRAY_BUFFER, n*(sizeof(*vertexLocations)),NULL, GL_STATIC_DRAW );
+		glBufferSubData(GL_ARRAY_BUFFER, 0, n*sizeof(*vertexLocations), vertexLocations);
 
 		//link the vertex attributes with the buffer
 		GLuint vPosition = glGetAttribLocation( program, "vPosition" );
 		glEnableVertexAttribArray( vPosition );
-		glVertexAttribPointer( vPosition, n, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
+		glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0) );
 		
 }
 
@@ -38,9 +38,9 @@ Shape::~Shape(){
 void Shape::build_shape(){
 	//set up the vertices
 	/*
-	vertexLocations[0] = vec3(-0.2,0,1);
-	vertexLocations[1] = vec3(0.2,0,1);
-	vertexLocations[2] = vec3(0,1,1);
+	vertexLocations[0] = vec4(-0.2,0,1);
+	vertexLocations[1] = vec4(0.2,0,1);
+	vertexLocations[2] = vec4(0,1,1);
 	*/
 }
 
@@ -51,7 +51,7 @@ void Shape::draw(){
 
 	//set the transformation matrices
 	GLuint model_loc = glGetUniformLocation(program,"model_matrix");
-	glUniformMatrix3fv(model_loc,1,GL_TRUE,modelmatrix);
+	glUniformMatrix4fv(model_loc,1,GL_TRUE,modelmatrix);
 
 	GLuint vColor = glGetUniformLocation(program, "color");
 	glUniform4fv(vColor, 1, color);
@@ -61,7 +61,7 @@ void Shape::draw(){
 
 }
 
-void Shape::set_points(vec3* points)
+void Shape::set_points(vec4* points)
 {
 	for (int i = 0; i < n; i++)
 		this->vertexLocations[i] = points[i];	

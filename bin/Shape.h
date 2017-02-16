@@ -25,10 +25,10 @@ public:
 	virtual vec4 get_color()
 	{ return this->color; }
 
-	virtual vec3* get_points()
+	virtual vec4* get_points()
 	{ return vertexLocations; }
 
-	virtual void set_points(vec3*);
+	virtual void set_points(vec4*);
 
 	virtual void draw();
 
@@ -38,11 +38,11 @@ public:
 	void set_draw_mode(GLenum dm)
 	{ draw_mode = dm; }
 
-	virtual vec3 get_center()
-	{return vec3(0,0,0);}
+	virtual vec4 get_center()
+	{return vec4(0, 0, 0, 0);}
 
 private:
-	vec3* vertexLocations;
+	vec4* vertexLocations;
 	int n; // # of points
 	vec4 color;
 	GLenum draw_mode;

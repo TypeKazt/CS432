@@ -10,16 +10,16 @@ protected:
 	GLuint program;
 	GLuint VAO;
 	GLuint VBO;
-	mat3 modelmatrix;
+	mat4 modelmatrix;
 	
 public:
 	virtual void draw()=0;
-	virtual void setModelMatrix(mat3 mm) { modelmatrix = mm; }
+	virtual void setModelMatrix(mat4 mm) { modelmatrix = mm; }
 	void set_shader(GLuint sp)
 	{ program = sp; }
-	mat3 get_model_matrix()
+	mat4 get_model_matrix()
 	{ return modelmatrix; }
-	virtual vec3 get_center()=0;
+	virtual vec4 get_center()=0;
 	virtual vec4 get_color()=0;
 	virtual void set_color(vec4)=0;
 };

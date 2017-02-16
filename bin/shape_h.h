@@ -2,6 +2,6 @@
 #define __ALL_SHAPES_H__
 
 #include "Shape.h"
-#include "shapes2D.h"
+#include "shapes.h"
 
 #endif
