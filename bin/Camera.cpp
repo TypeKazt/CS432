@@ -21,6 +21,14 @@ void Camera::look(vec4 eye, vec4 at, vec4 up)
 	view_matrix = LookAt(eye, at, up);
 	unsigned int i;
 
+	this->eye = eye;
+	this->up = up;
+	this->at = at;
+
+	u = view_matrix[0];
+	v = view_matrix[1];
+	n = view_matrix[2];
+
 	if( programs->size() > prev_prog_size )
 		for(i = prev_prog_size; i < programs->size(); i++)
 			vm_glsl.push_back(glGetUniformLocation((*programs)[i], "view_matrix"));	

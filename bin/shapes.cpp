@@ -134,6 +134,9 @@ void Polyhedron::setModelMatrix(mat4 mm)
 
 void Polyhedron::build_shape()
 {
-	for(int i = 0; i < size; i++)
+	for(unsigned int i = 0; i < size; i++)
+	{
 		_triangles[i].set_shader(program);
+		_triangles[i].set_color(get_color());
+	}
 }
