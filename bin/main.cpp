@@ -87,11 +87,13 @@ void init()
 	Camera::get_instance()->look(vec4(0,0,0,1), vec4(0,0,-2,1), up);
 
 	srand(time(NULL));
-	make_polyhedron();
+//	make_polyhedron();
 	ro = mat4(vec4(.988877, 0, 0.149438, 0), 
 				  vec4(0, 1, 0, 0), 
 				  vec4(-0.149438, 0, .988877, 0), 
 				  vec4(0, 0, 0, 1));
+
+	Sphere* my_sphere = new Sphere();
 
 	//define color to use when color buffer is cleared
 	glEnable( GL_DEPTH_TEST );
@@ -217,30 +219,6 @@ void make_polyhedron()
 		tris[i]->build();
 		objs.push_back(tris[i]);
 	}
-/*
-	Triangle* wire[8];
-
-	for(int i = 1; i < 5 ; i++)
-		wire[i-1] = new Triangle(pt[0], pt[i], pt[(i%4)+1]);
-	for(int i = 1; i < 5 ; i++)
-		wire[3+i] = new Triangle(pt[5], pt[i], pt[(i%4)+1]);
-
-	//Polyhedron* ph = new Polyhedron(*tris, 8);
-	//ph->set_shader(p);
-	//ph->set_draw_mode(GL_TRIANGLES);
-	
-	for(int i = 0; i < 8; i++)
-	{
-		//ph->set_triangle_color(0, vec4(1,0,0,0));
-		tris[i]->set_shader(p);
-		tris[i]->set_draw_mode(GL_LINES);
-		tris[i]->set_color(vec4(0,0,0,1));
-		tris[i]->setModelMatrix(tranlate);
-		tris[i]->build();
-		objs.push_back(tris[i]);
-	}*/
-	//ph->build();
-	//objs.push_back(ph);
 }
 
 void move(int key)

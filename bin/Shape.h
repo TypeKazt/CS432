@@ -19,21 +19,28 @@ public:
 
 	virtual void build();
 
-	virtual void set_color(vec4 color)
-	{ this->color = color; }
-	
-	virtual vec4 get_color()
-	{ return this->color; }
+	void set_color(vec4);
 
-	virtual vec4* get_points()
+	void set_vertex_color(int index, vec4 color)
+	{ colors[index] = color; }
+	
+	vec4* get_colors()
+	{ return this->colors; }
+
+	vec4* get_points()
 	{ return vertexLocations; }
+
+	void set_point(int index, vec4 p)
+	{ vertexLocations[index] = p; }
 
 	virtual void set_points(vec4*);
 
-	virtual void draw();
+	void draw();
 
 	int get_n()
 	{ return n; }
+
+	void set_n(int);
 
 	void set_draw_mode(GLenum dm)
 	{ draw_mode = dm; }
@@ -44,11 +51,14 @@ public:
 private:
 	vec4* vertexLocations;
 	int n; // # of points
-	vec4 color;
+	vec4* colors;
 	GLenum draw_mode;
+	bool compound;
 
 protected:
-	virtual void build_shape();
+	virtual void build_shape()
+	{}
 			
 };
+
 #endif

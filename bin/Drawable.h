@@ -20,7 +20,7 @@ public:
 	mat4 get_model_matrix()
 	{ return modelmatrix; }
 	virtual vec4 get_center()=0;
-	virtual vec4 get_color()=0;
+	virtual vec4* get_colors()=0;
 	virtual void set_color(vec4)=0;
 };
 
