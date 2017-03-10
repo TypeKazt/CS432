@@ -5,6 +5,7 @@ Shape::Shape(int n) {
 	this->n = n;
 	this->vertexLocations = new vec4[n];
 	this->colors = new vec4[n];
+	this->normals = new vec4[n];
 	draw_mode = GL_TRIANGLES;
 }
 
@@ -17,6 +18,7 @@ void Shape::set_n(int n)
 	this->n = n;
 	vertexLocations = new vec4[n];
 	colors = new vec4[n];
+	normals = new vec4[n];
 }
 
 void Shape::build(){

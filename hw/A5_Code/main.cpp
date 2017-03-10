@@ -3,6 +3,7 @@
 #include "Angel.h"  //includes gl.h, glut.h and other stuff...
 #include "shape_h.h"
 #include "Camera.h"
+#include "ConeLight.h"
 
 //Foward declarations of functions
 void init();
@@ -35,9 +36,20 @@ vec4 center = vec4(0,0,0,1);
 GLuint p; // global shader
 GLuint pm; //projection matrix
 mat4 ro;
+
+Light sun;
+float sun_delta;
+float sun_angle;
+
+ConeLight flash;
+
 float roll_theta = 1.5708;
 float pitch_theta = M_PI;
 float yaw_theta = M_PI;
+
+float x_theta = 0.0f;
+float y_theta = 0.0f;
+float z_theta = 0.0f;
 
 
 //----------------------------------------------------------------------------
@@ -87,13 +99,28 @@ void init()
 	Camera::get_instance()->set_programs(&shaders);
 	Camera::get_instance()->look(vec4(0,0,0,1), vec4(0,0,-2,1), up);
 
+	sun_delta = 2*M_PI/360; // 1 degree
+	sun = Light();
+	sun.set_program(p);
+	sun.set_position(vec4(0, 0, 3.0, 1.0));
+	sun.set_diffuse(vec4(1, .5, 0, 1));
+	//sun.apply_light();
+
+	flash = ConeLight();
+	flash.set_program(p);
+	flash.set_position(Camera::get_instance()->get_eye());
+	flash.set_id(std::string("2"));
+	flash.set_diffuse(vec4(1, .5, 0, 1));
+	flash.apply_light();
+
 	srand(time(NULL));
-	//make_polyhedron();
+	make_polyhedron();
 	ro = mat4(vec4(.988877, 0, 0.149438, 0), 
 				  vec4(0, 1, 0, 0), 
 				  vec4(-0.149438, 0, .988877, 0), 
 				  vec4(0, 0, 0, 1));
 	mat4 tranlate = mat4(vec4(1,0,0,0), vec4(0,1,0,0), vec4(0,0,1,-6), vec4(0,0,0,1)); // translate -2 in z
+
 
 	Sphere* my_sphere = new Sphere();
 	my_sphere->set_shader(p);
@@ -107,6 +134,7 @@ void init()
 	//define color to use when color buffer is cleared
 	glEnable( GL_DEPTH_TEST );
     glClearColor( 1.0, 1.0, 1.0, 1.0 ); 
+	rotate(1);
 }
 
 //----------------------------------------------------------------------------
@@ -135,8 +163,9 @@ void keyboard( unsigned char key, int x, int y )
 	    exit( EXIT_SUCCESS );
 	    break;
 	case 32: //space 
-		ron = !ron;
-		rotate(0);
+		flash.set_enable(flash.get_enable() * -1);	
+		flash.apply_light();
+		glutPostRedisplay();
 		break;
 	case 88: // X
 		pitch(-1);
@@ -178,26 +207,36 @@ void close(){
 
 void rotate(int x)
 {
-	if (ron){
-			for (unsigned long i = 0; i < objs.size(); i++)
-			{
-				mat4 ti = mat4(vec4(1, 0, 0, 0), vec4(0, 1, 0, 0), vec4(0, 0, 1, 2), vec4(0, 0, 0, 1));
-				mat4 tf = mat4(vec4(1, 0, 0, 0), vec4(0, 1, 0, 0), vec4(0, 0, 1, -2), vec4(0, 0, 0, 1));
-				mat4 ft = tf * ro * ti;
-				ft *= objs[i]->get_model_matrix();
-				objs[i]->setModelMatrix(ft);
-			}
-			glutPostRedisplay();
-			glutTimerFunc(50, rotate, x);
-	}
+	vec4 pos = sun.get_position();
+	sun_angle += sun_delta;
+	pos = vec4(cos(sun_angle)*-30, sin(sun_angle)*10, 0, 1);
+	sun.set_position(pos);
+	sun.apply_light();
+
+	glutPostRedisplay();
+	glutTimerFunc(14, rotate, x);
 }
 
 void make_floor()
 {
-	vec4 pt[] = {vec4(-30, -5, -30, 1),
-				vec4(-30, -5, 30, 1),
-				vec4(30, -5, 30, 1),
-				vec4(30, -5, -30 , 1)};
+	int legnth, width;
+	legnth = 100; width = 100;
+	vec4 startP = vec4(-30, 0, -30, 1);
+	vec4 endP = vec4(30, -5, 30, 1);
+	vec4 delta = endP - startP;
+	vec4 norm = vec4(0, 1, 0, 0);
+
+	vec4 pt[] = {vec4(-30, -.9, -30, 1),
+				vec4(-30, -.9, 30, 1),
+				vec4(30, -.9, 30, 1),
+				vec4(30, -.9, -30 , 1)};
+/*	for (int i = 0; i < length; i++)
+	{
+		for (int j = 0; j < legnth; j++)
+		{
+			pt[i*legnth + j] = startP + delta/(
+		}
+	}*/
 	Triangle* a = new Triangle(pt[0], pt[1], pt[2]);
 	Triangle* b = new Triangle(pt[0], pt[3], pt[2]);
 
@@ -205,6 +244,12 @@ void make_floor()
 	b->set_shader(p);
 	a->set_color(vec4(0, 1, 0, 1));
 	b->set_color(vec4(0, 1, 0, 1));
+	a->set_surface(vec4(0), vec4(0,1,0,1), vec4(0,1,0,1), 10);
+	for (int i = 0; i < 3; i++)
+	{
+		a->set_normal(i, vec4(0,1,0,0));
+		b->set_normal(i, vec4(0,1,0,0));
+	}
 	a->build();
 	b->build();
 	objs.push_back(a);
@@ -239,10 +284,13 @@ void make_polyhedron()
 		//ph->set_triangle_color(0, vec4(1,0,0,0));
 		tris[i]->set_shader(p);
 		tris[i]->set_draw_mode(GL_TRIANGLES);
-		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		vec4 norm = tris[i]->get_normal();
+		for(int n = 0; n < 3; n++)
+			tris[i]->set_normal(n, norm);
+		/*float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		tris[i]->set_color(vec4(r,g,b,1));
+		tris[i]->set_color(vec4(r,g,b,1));*/
 		tris[i]->setModelMatrix(tranlate);
 		tris[i]->build();
 		objs.push_back(tris[i]);
@@ -257,25 +305,37 @@ void move(int key)
 	vec4 u = Camera::get_instance()->get_u();
 	vec4 v = Camera::get_instance()->get_n();
 	vec4 f = .1*v;
-	vec4 b = -.1*v;
+	vec4 b = .1*v;
 	vec4 l = -.1*u;
 	vec4 r = .1*u;
 	switch(key)
 	{
 		case GLUT_KEY_LEFT:
 			Camera::get_instance()->look(eye+l, at+l, up);
+			flash.set_position(Camera::get_instance()->get_eye());
+			flash.set_direction((flash.get_position() - Camera::get_instance()->get_n()) - vec4(0,0,0,1));
+			flash.apply_light();
 			glutPostRedisplay();
 			break;
 		case GLUT_KEY_RIGHT:
 			Camera::get_instance()->look(eye+r, at+r, up);
+			flash.set_position(Camera::get_instance()->get_eye());
+			flash.set_direction((flash.get_position() - Camera::get_instance()->get_n()) - vec4(0,0,0,1));
+			flash.apply_light();
 			glutPostRedisplay();
 			break;
 		case GLUT_KEY_UP:
-			Camera::get_instance()->look(eye+f, at+f, up);
+			Camera::get_instance()->look(eye-f, at-f, up);
+			flash.set_position(Camera::get_instance()->get_eye());
+			flash.set_direction((flash.get_position() - Camera::get_instance()->get_n()) - vec4(0,0,0,1));
+			flash.apply_light();
 			glutPostRedisplay();
 			break;
 		case GLUT_KEY_DOWN:
 			Camera::get_instance()->look(eye+b, at+b, up);
+			flash.set_position(Camera::get_instance()->get_eye());
+			flash.set_direction((flash.get_position() - Camera::get_instance()->get_n()) - vec4(0,0,0,1));
+			flash.apply_light();
 			glutPostRedisplay();
 			break;
 	}
@@ -296,10 +356,11 @@ void pitch(int dir)
 {
 	// alter at point about x axis
 	float delta = dir*0.1;
-	pitch_theta += delta;
+	z_theta += delta; y_theta += delta;
 	vec4 at = Camera::get_instance()->get_at();
+	vec4 eye = Camera::get_instance()->get_eye();
 	Camera::get_instance()->look(Camera::get_instance()->get_eye(), 
-								 vec4(at.x, sin(pitch_theta), cos(pitch_theta), 1),
+								 vec4(at.x, sin(y_theta) , -cos(z_theta), 1) + eye,
 								 Camera::get_instance()->get_up());
 	glutPostRedisplay();
 
@@ -309,10 +370,11 @@ void yaw(int dir)
 {
 	// alter at point about y axiz
 	float delta = dir*0.1;
-	yaw_theta += delta;
+	x_theta += delta; z_theta += delta;
+	vec4 eye = Camera::get_instance()->get_eye();
 	vec4 at = Camera::get_instance()->get_at();
-	Camera::get_instance()->look(Camera::get_instance()->get_eye(), 
-								 vec4(sin(yaw_theta), at.y, cos(yaw_theta), 1),
+	Camera::get_instance()->look(eye, 
+								 vec4(sin(x_theta), at.y, -cos(z_theta)-1, 1) + eye,
 								 Camera::get_instance()->get_up());
 	glutPostRedisplay();
 }

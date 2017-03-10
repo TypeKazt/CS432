@@ -4,6 +4,7 @@
 #include "Angel.h"
 #include "Drawable.h"
 #include <algorithm>
+#include "Surface.h"
 
 class Shape: public Drawable{  //derived from drawable class
 
@@ -54,6 +55,9 @@ public:
 	virtual vec4 get_center()
 	{return vec4(0, 0, 0, 0);}
 
+	void set_surface(vec4 a, vec4 d, vec4 s, float sh)
+	{ surf = Surface(a, d, s, sh); }
+
 private:
 	vec4* vertexLocations;
 	int n; // # of points
@@ -61,6 +65,10 @@ private:
 	vec4* normals;
 	GLenum draw_mode;
 	bool compound;
+	Surface surf;
+
+	GLuint vPosition, vNormal, model_loc;
+	GLuint diffuse_loc, spec_loc, ambient_loc, alpha_loc;
 
 protected:
 	virtual void build_shape()

@@ -43,17 +43,22 @@ vec4 Sphere::unit(const vec4& p)
 void Sphere::triangle(const vec4& a, const vec4& b, const vec4& c)
 {
 	vec4 color(1.0*rand() / RAND_MAX, 1.0*rand() / RAND_MAX/ 1.0*rand() / RAND_MAX, 1.0);
+	Triangle myt = Triangle(a,b,c);
+	vec4 norm = myt.get_normal();
 	
 	set_point(index, a);
 	set_vertex_color(index, color);
+	this->set_normal(index, norm);
 	index++;
 
 	set_point(index, b);
 	set_vertex_color(index, color);
+	this->set_normal(index, norm);
 	index++;
 
 	set_point(index, c);
 	set_vertex_color(index, color);
+	this->set_normal(index, norm);
 	index++;
 
 }

@@ -86,6 +86,8 @@ void init()
 	Camera::get_instance()->set_programs(&shaders);
 	Camera::get_instance()->look(vec4(0,0,0,1), vec4(0,0,-2,1), up);
 
+	vec4 test;
+
 	srand(time(NULL));
 //	make_polyhedron();
 	ro = mat4(vec4(.988877, 0, 0.149438, 0), 
